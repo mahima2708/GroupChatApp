@@ -40,10 +40,43 @@
                 </div>
             </form>
         </div>
+        <div class="flex justify-center items-center h-screen w-full ">
+            <h1 class="text-2xl font-bold text-white">ChatBox Application</h1>
+        </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
-        // 
+       async function signup(event){
+        
+        try{
+            event.preventDefault()
+            let obj ={
+               name: event.target.form.username.value,
+               Email: event.target.form.email.value, 
+               Number: event.target.form.number.value,
+               Password: event.target.form.password.value
+       } 
+       if(event.target.form.username.value===' '||  event.target.form.email.value=== ' ' ||  event.target.form.number.value=== ' '||  event.target.form.password.value=== ' ')
+       {
+        document.getElementById('warningMessage').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('warningMessage').style.display = 'none';
+                }, 500);
+                return;
+       }
+      const call = await  axios.post("http://localhost:3000/signup", obj )
+      if(call.status=== 200){
+        console.log("successful");
+      }
+      else{
+        throw new Error("failed to signup");
+      }
+        }
+        catch(error){
+         throw new Error(error)
+        }
+       
+        }
     </script>
 </body>
 </html>
