@@ -10,8 +10,9 @@ exports.postfile = (req,res,next)=>{
 }
 
 exports.addUser = async (req,res,next)=>{
-    console.log("@@@2" ,req.body);
+    //console.log("@@@2" ,req.body);
     try{
+        
     const name = req.body.name;
     const email = req.body.Email;
     const number = req.body.Number;
@@ -19,6 +20,7 @@ exports.addUser = async (req,res,next)=>{
     const password = req.body.Password;
     const saltrounds = 5;
     bcrypt.hash(password, saltrounds, async(err, hash)=>{
+        try{
         const data = await userTable.create({
             name:name,
             emailid:email,
@@ -27,9 +29,14 @@ exports.addUser = async (req,res,next)=>{
             userId: req.user
         });
         res.status(200).json({newdata:data})
+    }
+    catch(error){
+        res.status(201).json({duplicate: "duplicateentry"})
+    }
     })
 }
 catch(error){
+    console.log("@@@@@@error");
     console.log(error)
 }
 }

@@ -67,13 +67,19 @@
       const call = await  axios.post("http://localhost:3000/signup", obj )
       if(call.status=== 200){
         console.log("successful");
+        alert("User signed in successfully");
+      }
+      else if(call.status===201){
+        alert("User already exists, Please Login");
+        
       }
       else{
-        throw new Error("failed to signup");
+        alert("failed to signup");
       }
         }
         catch(error){
-         throw new Error(error)
+          throw new Error(error);
+
         }
        
         }
