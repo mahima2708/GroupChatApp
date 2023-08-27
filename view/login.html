@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <title>LoginPage</title>
+</head>
+<body>
+    <div  class="bg-gradient-to-br from-fuchsia-900 to-blue-900 h-screen flex justify-center">
+      
+        <form class="bg-white h-80 py-5 w-96 my-14">
+            <h1 class="text-black font-bold text-2xl text-center">Login Form</h1>
+            <div class="space-x-8 py-5 px-4">
+                    <label  id="emailid" name="email">E-mail</label>
+                    <input class="w-4/5 border-b border-violet-500 focus:outline-violet-700"  type="text" id="emailid" name="email">
+                </div>
+                  <div class="space-x-2 py-3 px-4">
+                    <label  id="password" name="password">Password</label>
+                    <input class="w-4/5 border-b border-violet-500 focus:outline-violet-700"  type="password" id="password" name="password">
+                    </div>
+                    <a class="text-fuchsia-800 px-5 text-sm text-left inline-block" href="recoverPassword.html" >Forgot Password?</a>
+                
+                    <div class="flex justify-between">
+                        <div class=" py-4 w-36 rounded-xl ml-4">
+                          <button class="bg-gradient-to-br text-white w-full rounded-xl" onClick="loginuser(event)">Login</button>
+                        </div>
+                        
+                        <div class=" py-4 w-36 rounded-xl mr-4">
+                          <button class="bg-gradient-to-br text-white w-full rounded-xl" onClick="signup(event)">SignUp</button>
+                        </div>
+                      </div>
+                <div class="bg-red-700 font-bold text-zinc-950" id ="Block">
+                    </div>
+            </form>
+            </div>
+            <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+            <script>
+                async function loginuser(event){
+                    event.preventDefault()
+                    const login = {
+                        email: event.target.form.email.value,
+                        password: event.target.form.password.value
+                    }
+                    const res = await axios.post('http://localhost:3000/login',login).then((response)=>{
+
+                    console.log("******",response);
+                        
+            
+                        
+                      
+                    })
+
+                    . catch((err)=>{
+                        var val = document.getElementById("Block");
+                        
+                       val.innerHTML= err.response.data.message;
+                        document.body.innerHTML += `<div style="colour:red;">${err}</div>`;
+                    })
+                    
+        
+                }
+
+                function signup(event){
+                    event.preventDefault()
+                    window.location.href = "signUp.html"
+                }
+
+               
+
+            </script>
+
+            <script src="https://cdn.tailwindcss.com"></script>  
+    
+</body>
+</html>
