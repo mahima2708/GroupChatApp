@@ -46,7 +46,8 @@
 
                         if(response.status==200)
                     console.log("******",response)
-                    localStorage.setItem('token',response.data.token);    
+                    localStorage.setItem('token',response.data.token); 
+                    window.location.href = "chatApp.html"   
                       
                     console.log(response.data.token);
                     })
