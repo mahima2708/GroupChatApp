@@ -2,12 +2,23 @@ const express= require('express');
 const path = require('path');
 const userTable = require('../models/signupDetails');
 const sequelize = require('sequelize');
+const token= require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
 exports.postfile = (req,res,next)=>{
     const filepath = path.join(__dirname,'../view/signUp.html');
     res.sendFile(filepath);
 }
+exports.loginsend= (req,res,next)=>{
+    const filepath = path.join(__dirname, '../view/login.html');
+    res.sendFile(filepath);
+}
+
+
+function generateToken(id,name){
+    return token.sign({userId:id,name:name}, '45$545778%576565');
+  }
+
 
 exports.addUser = async (req,res,next)=>{
     //console.log("@@@2" ,req.body);
@@ -39,4 +50,38 @@ catch(error){
     console.log("@@@@@@error");
     console.log(error)
 }
+}
+
+exports.loginUser = async ( req,res,next)=>{
+    try{
+    email = req.body.email;
+    password = req.body.password;
+    const user = await userTable.findOne({
+        where: {
+            emailid: email
+        }
+    });
+    if(!user){
+        res.status(404).json({success:false,  message: "User Not Found"})
+    }
+    else{
+        const record = await userTable.findOne({
+            where: {
+                emailid: email,
+                password: password
+            }
+        });
+        bcrypt.compare( password, user.password, (err, result)=>{
+            if(result === true){
+                res.status(200).json({success: true , message: "User logged in successfully", token: generateToken(user.id, user.name)});
+            }
+            else{
+                res.status(401).json({success: false, message: "Password incorrect"})
+            }
+        })
+    }
+}
+     catch (error) {
+    console.error('Error retrieving entry:', error);
+  }
 }
