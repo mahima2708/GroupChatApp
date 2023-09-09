@@ -1,9 +1,11 @@
 const express= require('express');
 const path = require('path');
 const userTable = require('../models/signupDetails');
+const msgTable = require('../models/messgaetable');
 const sequelize = require('sequelize');
 const token= require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+
 
 exports.postfile = (req,res,next)=>{
     const filepath = path.join(__dirname,'../view/signUp.html');
@@ -84,4 +86,20 @@ exports.loginUser = async ( req,res,next)=>{
      catch (error) {
     console.error('Error retrieving entry:', error);
   }
+}
+
+exports.storemessages = async (req,res,next)=>{
+    const message = req.body.message;
+    try{
+        const data = await msgTable.create({
+            messages: message,
+            UserId: req.user.id
+        });
+        res.status(200).json({message: "message stored" , success: true})
+
+
+    }
+    catch(error){
+    console.log(error);
+    }
 }

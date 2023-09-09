@@ -14,14 +14,6 @@ const signedUsers = database.define('Users',{
         },
         contactNo: sequelize.INTEGER,
         password: sequelize.STRING,
-        ispremiumuser: {
-            type: sequelize.BOOLEAN,
-            defaultValue : 0,
-        },
-        total_expense: {
-            type: sequelize.INTEGER,
-            defaultValue : 0,
-        }
     });
 
     module.exports = signedUsers;
