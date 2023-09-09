@@ -11,12 +11,24 @@
     <header class="bg-gray-900 text-white py-2 text-center">
         <h1>GroupChat App</h1>
     </header>
-
+    <div class="flex">
+        <div class="w-full sm:w-1/3 p-2 sm:sticky sm:top-0 h-screen bg-sky-200">
+          <!-- Content for the left div goes here -->
+        </div>
+      
+        <div class="w-full sm:w-2/3 p-2 sm:sticky h-screen bg-white flex justify-center">
+            <div class="px-10  my-2 flex justify-center">
+                <ul  id="messages"></ul>
+              </div>        </div>
+      </div>
+      
+    
     <div class="bg-gray-300 text-black py-2 text-center fixed bottom-0 w-full">
         <label for="userInput" class="font-bold">Enter your text:</label>
         <input type="text" id="userInput" name="userInput" class="p-2" style="width: 300px;">
         <button class="bg-gray-800 text-white w-36 h-10 rounded-xl" onClick="sendMessage(event)">Send</button>
     </div>
+    
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
         async function sendMessage(event){
@@ -29,7 +41,8 @@
                 const token = localStorage.getItem('token');
                 const message = await axios.post('http://localhost:3000/messages',  messages  ,{headers: {"Authorisation": token} })
                 if(message.status===200){
-                    console.log("message stored");
+                    console.log("23232",message.data.message);
+                    showOnScreen(message.data.message,0)
                 }
             //     const messgae = {
             //            messgae: event.target.userInput
@@ -39,6 +52,46 @@
                 console.log(err);
             }
         }
+        
+        window.addEventListener('DOMContentLoaded', async()=>{
+            const node = document.getElementById('messages');
+            node.innerHTML= " ";
+            await axios.get('http://localhost:3000/message').then(async(response)=>{
+               console.log("@#@#@#@#", response);
+               for(var i =0;i<response.data.newdata.length;i++){
+           showOnScreen(response.data.newdata[i],i)
+               }
+            }).catch((err)=>{
+                console.log(err);
+            })
+        })
+
+function  showOnScreen(data,i){
+    document.getElementById('userInput').value = "";
+    const firstNode = document.getElementById('messages');
+    var inputData = 0;
+    if(i%2!=0){
+        inputData = `
+
+  <li class="mr-4 p-2 bg-gray-300 rounded-lg ">
+    <span class=" text-black text-green text-sm underline"> ${data.name }: </span><br>
+    <span class="ml-2 font-semibold text-black">  ${data.message}</span>
+  </li>
+`;
+
+              }
+
+              else{
+             inputData = `<li class = "mr-4 p-2 bg-stone-200  rounded-lg mb-2 "> 
+                <span class=" text-black text-green text-sm underline"> ${data.name }: </span><br>
+                <span class="ml-2 font-semibold text-black">  ${data.message}</span>
+                             </li>`
+              }
+           
+  firstNode.innerHTML = firstNode.innerHTML + inputData;
+
+}
+
     </script>
 
 

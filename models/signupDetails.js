@@ -6,8 +6,11 @@ const signedUsers = database.define('Users',{
             autoIncrement: true,
             allowNull: false,
             primaryKey: true
+            
         },
-        name: sequelize.STRING,
+        name: {
+           type:sequelize.STRING,
+        },
         emailid:{
             type:sequelize.STRING,
             unique: true,

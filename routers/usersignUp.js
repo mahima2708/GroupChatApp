@@ -9,5 +9,6 @@ router.get('/login.html', routeControl.loginsend);
 router.post('/signup', routeControl.addUser);
 router.post('/login', routeControl.loginUser);
 router.post('/messages', userAuthentication.authorisation,  routeControl.storemessages);
+router.get('/message', routeControl.getMessages );
 
 module.exports = router;

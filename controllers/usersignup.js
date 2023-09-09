@@ -92,14 +92,34 @@ exports.storemessages = async (req,res,next)=>{
     const message = req.body.message;
     try{
         const data = await msgTable.create({
-            messages: message,
-            UserId: req.user.id
+            message,
+            UserId: req.user.id,
+            name:req.user.name,
         });
-        res.status(200).json({message: "message stored" , success: true})
+        res.status(200).json({message: data , success: true})
 
 
     }
     catch(error){
     console.log(error);
     }
+}
+
+exports.getMessages = async (req,res,next)=>{
+    const msg = await msgTable.findAll().then((response)=>{
+        const msgArray = [];
+        response.forEach((item)=>{
+
+            msgArray.push({
+                message:item.message,
+                name:item.name
+            
+            })
+        })
+        res.status(201).json({newdata: msgArray});
+    }).catch((err)=>{
+        res.status(404).json({err:err});
+    })
+
+    
 }

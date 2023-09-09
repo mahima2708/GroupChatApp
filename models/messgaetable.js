@@ -10,7 +10,8 @@ const messages = db.define('userMessage', {
         allowNull: false,
         primaryKey: true
     },
-    messages: sequelize.STRING,
+    message: sequelize.STRING,
+    name:sequelize.STRING,
 } )
 
 module.exports= messages;
