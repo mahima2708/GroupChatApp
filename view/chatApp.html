@@ -16,19 +16,21 @@
           <!-- Content for the left div goes here -->
         </div>
       
-        <div class="w-full sm:w-2/3 p-2 sm:sticky h-screen bg-white flex justify-center">
+        <div class="w-full sm:w-2/3 p-2 sm:sticky h-full bg-white flex justify-center">
             <div class="px-10  my-2 flex justify-center">
-                <ul  id="messages"></ul>
+                <ul class="overflow-auto" id="messages"></ul>
               </div>        </div>
       </div>
       
-    
-    <div class="bg-gray-300 text-black py-2 text-center fixed bottom-0 w-full">
-        <label for="userInput" class="font-bold">Enter your text:</label>
-        <input type="text" id="userInput" name="userInput" class="p-2" style="width: 300px;">
-        <button class="bg-gray-800 text-white w-36 h-10 rounded-xl" onClick="sendMessage(event)">Send</button>
-    </div>
-    
+
+    <div class="bg-gray-300 text-black py-2 text-center fixed bottom-0 w-1/3">
+        <label for="userInput" class="font-bold">Enter message:</label>
+        <input type="text" id="userInput" name="userInput" class="mb-1 mr-2" style="width: 300px;">
+        <!-- The "mr-2" class adds margin to the right of the input element -->
+        <button class="bg-gray-800 w-36 h-8 rounded-xl text-white" onClick="sendMessage(event)">Send</button>
+      </div>
+
+      
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
         async function sendMessage(event){
@@ -65,7 +67,20 @@
                 console.log(err);
             })
         })
+        const callapi= async()=>{
+            const node = document.getElementById('messages');
+            node.innerHTML= " ";
+            await axios.get('http://localhost:3000/message').then(async(response)=>{
+               console.log("@#@#@#@#", response);
+               for(var i =0;i<response.data.newdata.length;i++){
+           showOnScreen(response.data.newdata[i],i)
+               }
+            }).catch((err)=>{
+                console.log(err);
+            })
+        }
 
+        setInterval(callapi,10000);
 function  showOnScreen(data,i){
     document.getElementById('userInput').value = "";
     const firstNode = document.getElementById('messages');
