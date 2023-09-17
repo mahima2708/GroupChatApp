@@ -25,7 +25,7 @@
 
     <div class="bg-gray-300 text-black py-2 text-center fixed bottom-0 w-1/3">
         <label for="userInput" class="font-bold">Enter message:</label>
-        <input type="text" id="userInput" name="userInput" class="mb-1 mr-2" style="width: 300px;">
+        <input type="text" id="userInput" name="userInput" class="mb-1 mr-2 w-2/3">
         <!-- The "mr-2" class adds margin to the right of the input element -->
         <button class="bg-gray-800 w-36 h-8 rounded-xl text-white" onClick="sendMessage(event)">Send</button>
       </div>
@@ -55,32 +55,100 @@
             }
         }
         
-        window.addEventListener('DOMContentLoaded', async()=>{
+        window.addEventListener('DOMContentLoaded', ()=>{
+         async function getandsavetolocalstorage(){
             const node = document.getElementById('messages');
             node.innerHTML= " ";
-            await axios.get('http://localhost:3000/message').then(async(response)=>{
+            const lclstorage = localStorage.getItem('msgs')
+            console.log("is it blank", lclstorage);
+            if(lclstorage===null){
+                const idval =0;
+                await axios.get(`http://localhost:3000/message/${idval}`).then(async(response)=>{
                console.log("@#@#@#@#", response);
-               for(var i =0;i<response.data.newdata.length;i++){
-           showOnScreen(response.data.newdata[i],i)
+               const msgArray = [];
+               var lower_bound =0;
+               var upper_bound = 11;
+               if (response.data.newdata.length>10){
+                lower_bound = response.data.newdata.length-10
+                upper_bound = response.data.newdata.length
                }
+               for(var i =lower_bound;i<upper_bound;i++){
+                var k=i+1;
+                const chats={
+                    id: k,
+                    name:response.data.newdata[i].name,
+                    message: response.data.newdata[i].message,
+                };
+                msgArray.push(chats);
+            }
+                const savemsg = JSON.stringify(msgArray);
+                localStorage.setItem('msgs', savemsg)
+               
+               fetchFromStorage()
             }).catch((err)=>{
                 console.log(err);
             })
-        })
-        const callapi= async()=>{
-            const node = document.getElementById('messages');
-            node.innerHTML= " ";
-            await axios.get('http://localhost:3000/message').then(async(response)=>{
+            }
+            else{
+                const lclstor = localStorage.getItem('msgs')
+            const parseentry = JSON.parse(lclstor)
+             const lastid  = parseentry.length;
+             const idval = parseentry[lastid-1].id;
+             console.log("isssssssssss", idval)
+             await axios.get(`http://localhost:3000/message/${idval}`).then(async(response)=>{
                console.log("@#@#@#@#", response);
-               for(var i =0;i<response.data.newdata.length;i++){
-           showOnScreen(response.data.newdata[i],i)
-               }
-            }).catch((err)=>{
-                console.log(err);
-            })
-        }
+            if(response.data.newdata.length!=0){
+               const msgArray = [];
+               var lower_bound =0;
+               var upper_bound = 1;
+               const lclstorage = localStorage.getItem('msgs')
+             localStorage.removeItem('msgs');
+               const pentry = JSON.parse(lclstorage)
+               const filteredArray = pentry.filter(entry => entry.id !== idval-10);
 
-        setInterval(callapi,10000);
+            // Save the modified array back to localStorage
+            localStorage.setItem('msgs', JSON.stringify(filteredArray));
+            const updated = localStorage.getItem('msgs')
+            const parseUpdate = JSON.parse(updated);
+            
+               var fethd =idval
+               for(var i =lower_bound;i<upper_bound;i++){
+                var k=fethd+1;
+                fethd++;
+                const chats={
+                    id: k,
+                    name:response.data.newdata[i].name,
+                    message: response.data.newdata[i].message,
+                };
+                msgArray.push(chats);
+            }
+            const newmsgs = parseUpdate.concat(msgArray)
+                const savemsg = JSON.stringify(newmsgs);
+                localStorage.setItem('msgs', savemsg)
+               
+               fetchFromStorage()
+            }
+            else{
+                console.log("No new entry");
+                fetchFromStorage()
+            }
+        }).catch((err)=>{
+                console.log(err);
+            })
+
+            }  
+            }
+            getandsavetolocalstorage();
+        
+        setInterval(() => {
+            getandsavetolocalstorage();
+    }, 10000); 
+           
+           
+        })
+
+      
+   
 function  showOnScreen(data,i){
     document.getElementById('userInput').value = "";
     const firstNode = document.getElementById('messages');
@@ -104,6 +172,15 @@ function  showOnScreen(data,i){
               }
            
   firstNode.innerHTML = firstNode.innerHTML + inputData;
+
+}
+async function fetchFromStorage(){
+const msgArray = localStorage.getItem('msgs');
+const arr = JSON.parse(msgArray);
+for(var i=0;i<arr.length;i++){
+    showOnScreen(arr[i],i)
+}
+console.log("Array is @@@", arr[0].id);
 
 }
 

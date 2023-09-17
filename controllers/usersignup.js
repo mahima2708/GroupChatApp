@@ -5,6 +5,7 @@ const msgTable = require('../models/messgaetable');
 const sequelize = require('sequelize');
 const token= require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+const { Op }= require('sequelize');
 
 
 exports.postfile = (req,res,next)=>{
@@ -106,7 +107,15 @@ exports.storemessages = async (req,res,next)=>{
 }
 
 exports.getMessages = async (req,res,next)=>{
-    const msg = await msgTable.findAll().then((response)=>{
+    const id = req.params.id;
+    console.log("id is %%%", id)
+    const msg = await msgTable.findAll({
+        where: {
+            id:{
+                [Op.gt]:id
+            }
+        }
+    }).then((response)=>{
         const msgArray = [];
         response.forEach((item)=>{
 
