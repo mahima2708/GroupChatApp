@@ -3,36 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>groupChat</title>
+    <title>GroupChat</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.15/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body>
+<body class="overflow-hidden">
+    <!-- Navigation -->
+    <nav class="bg-teal-800">
+        <header class="text-white py-2 text-center">
+            <h1 class="text-white">GroupChat App</h1>
+        </header>
+    </nav>
 
-    <header class="bg-gray-900 text-white py-2 text-center">
-        <h1>GroupChat App</h1>
-    </header>
-    <div class="flex">
-        <div class="w-full sm:w-1/3 p-2 sm:sticky sm:top-0 h-screen bg-sky-200">
-          <!-- Content for the left div goes here -->
+    <!-- Main Content -->
+    <div class="flex flex-col sm:flex-row h-screen ">
+        <!-- Sidebar -->
+        <div class="border-2 border-solid border-teal-600 mt-2 mb-2 rounded-lg sm:w-1/3 p-2 sm:top-0 h-5/6 sm:h-5/6 bg-white overflow-y-auto">
+            <div class="flex justify-between">
+                <button class="ml-2 bg-gray-800 w-full sm:w-28 h-8 rounded-xl text-white mb-2" onClick="createGroup(event)">New Group</button>
+                <button class="bg-gray-800 w-full sm:w-20 h-8 rounded-xl text-white mb-2" onClick="logout(event)">Logout</button>
+            </div>
+            <div>
+                <ul id="grpList">
+                </ul>
+                
+            </div>
         </div>
-      
-        <div class="w-full sm:w-2/3 p-2 sm:sticky h-full bg-white flex justify-center">
-            <div class="px-10  my-2 flex justify-center">
+
+        <!-- Message Display Area -->
+
+        <div class="border-2 border-solid border-teal-600  mt-2 ml-2 mb-2 rounded-lg sm:w-2/3 p-2 sm:sticky h-5/6 sm:h-5/6 bg-white flex justify-between">
+            <div id="group_name" class=" hidden px-10 my-2 flex justify-between">
+                <h1 class=" text-green ">My2ndGroup</h1>
+                <div class="space-x-2">
+                    <button class="bg-gray-800 w-28 h-8 rounded-xl text-white fixed right-28" onClick="createGroup(event)">Edit</button>
+                    <button class="bg-gray-800 w-20 h-8 rounded-xl text-white fixed right-10" onClick="logout(event)">Info</button>
+                </div>
+            </div>
+            
+            
+           
+            <div class="px-10 my-2 flex justify-center">
                 <ul class="overflow-auto" id="messages"></ul>
-              </div>        </div>
-      </div>
-      
+            </div>
+        </div>
+    </div>
 
-    <div class="bg-gray-300 text-black py-2 text-center fixed bottom-0 w-1/3">
-        <label for="userInput" class="font-bold">Enter message:</label>
-        <input type="text" id="userInput" name="userInput" class="mb-1 mr-2 w-2/3">
-        <!-- The "mr-2" class adds margin to the right of the input element -->
-        <button class="bg-gray-800 w-36 h-8 rounded-xl text-white" onClick="sendMessage(event)">Send</button>
-      </div>
-
-      
+   <!-- <-- Message Input and Group Creation Div -->
+     <div class=" justify-between items-center border-2 border-solid border-gray-950 bg-gray-300 text-black py-2 text-center fixed bottom-2 w-screen">
+        <div class="flex flex-col sm:flex-row items-center justify-center">
+            <label for="userInput" class="font-bold">Enter message:</label>
+            <input type="text" id="userInput" name="userInput" class="mb-1 mr-2 h-10 w-full sm:w-2/3">
+            <button class="bg-gray-800 w-full sm:w-36 h-8 rounded-xl text-white mb-2 ml-12" onClick="sendMessage(event)">Send</button>
+        </div>
+    </div>
+         
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
+
+        function grouphandler(){
+            if(localStorage.getItem('currentgrp')!= null){
+              const grpDiv = document.getElementById("group_name");
+              grpDiv.classList.toggle('hidden');
+              const h1Element = grpDiv.querySelector('h1');
+              const groupname = localStorage.getItem('currentgrp');
+
+               h1Element.textContent = groupname;
+
+            }
+        }
+
+        grouphandler()
         async function sendMessage(event){
             event.preventDefault()
             try{
@@ -46,9 +86,6 @@
                     console.log("23232",message.data.message);
                     showOnScreen(message.data.message,0)
                 }
-            //     const messgae = {
-            //            messgae: event.target.userInput
-            //         }
              }
             catch(err){
                 console.log(err);
@@ -138,25 +175,50 @@
 
             }  
             }
-            getandsavetolocalstorage();
+            // getandsavetolocalstorage();
         
-        setInterval(() => {
-            getandsavetolocalstorage();
-    }, 10000); 
+    //     setInterval(() => {
+    //         getandsavetolocalstorage();
+    // }, 10000); 
            
            
         })
 
-      
+        async function displaygroupName() {
+  const token = localStorage.getItem('token');
+  const grList = document.getElementById('grpList');
+  if (localStorage.getItem("group") !== null) {
+    const groups = await axios.get('http://localhost:3000/getgroups', {
+      headers: { "Authorisation": token } // Note the corrected spelling of "Authorization"
+    }).then((response) => {
+      console.log("groups are", response.data.message.length);
+      for (var i = 0; i < response.data.message.length; i++) {
+        const listItem = document.createElement('li');
+        listItem.id = response.data.message[i].id;
+        listItem.className = "text-green bg-gray-300 p-2 border-2 border-solid border-black-800";
+        listItem.innerHTML = `<span class="text-green text-lg">${response.data.message[i].name}</span>`;
+        
+        // Add a click event listener to the created list item
+        listItem.addEventListener('click', function() {
+          // Handle the click event here, for example, alert the ID
+          console.log("its almost done ")
+        });
+
+        grList.appendChild(listItem);
+      }
+    })
+  }
+}
+
    
 function  showOnScreen(data,i){
     document.getElementById('userInput').value = "";
-    const firstNode = document.getElementById('messages');
-    var inputData = 0;
+    const firstNode = documenputData = 0;
     if(i%2!=0){
         inputData = `
 
-  <li class="mr-4 p-2 bg-gray-300 rounded-lg ">
+  <li class="mr-4 p-2 bg-gray-300 rt.getElementById('messages');
+    var inounded-lg ">
     <span class=" text-black text-green text-sm underline"> ${data.name }: </span><br>
     <span class="ml-2 font-semibold text-black">  ${data.message}</span>
   </li>
@@ -184,6 +246,57 @@ console.log("Array is @@@", arr[0].id);
 
 }
 
+
+displaygroupName()
+
+      
+
+        async function createGroup(event){
+            event.preventDefault()
+            try{
+                 window.location.href = "groupcreation"
+            }
+            catch(err){
+                console.log(err);
+            }
+        }
+
+//         async function addUsers(){
+
+//             const token = localStorage.getItem('token')
+//             const users = await axios.get('http://localhost:3000/users', {headers: {"Authorisation": token} })
+//             if(users.status===200){
+//                 var container = document.getElementById('usersList');
+//                     container.classList.toggle('hidden')
+//                 console.log("all users", users.data.newdata[0].name)
+//                 var firstNode = "";
+
+//                 for(var i=0;i<users.data.newdata.length;i++){
+//                     firstNode = document.getElementById('users');
+                    
+//     var inputData = 0;
+//         inputData = `
+
+//   <li class="mr-4 p-2 bg-gray-300 rounded-lg flex justify-between items-center ">
+
+//     <div class="txt-black font-bold text-lg ">${users.data.newdata[i].name }  </div>
+    
+//     <button class= "bg-gray-800 text-white rounded-xl ml-2 h-8 w-14 mb-2">Add </button> 
+      
+//   </li>
+// `;
+
+//  firstNode.innerHTML = firstNode.innerHTML + inputData;
+
+ 
+//                 }
+              
+//             }
+           
+
+//         }
+
+       
     </script>
 
 

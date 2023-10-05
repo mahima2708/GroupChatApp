@@ -10,5 +10,11 @@ router.post('/signup', routeControl.addUser);
 router.post('/login', routeControl.loginUser);
 router.post('/messages', userAuthentication.authorisation,  routeControl.storemessages);
 router.get('/message/:id', routeControl.getMessages );
-
+router.post('/groupCreate',userAuthentication.authorisation,routeControl.create_Group);
+router.get('/user',userAuthentication.authorisation, routeControl.getUsers);
+router.get('/groupcreation', routeControl.sendPage)
+router.get('/users', routeControl.sendUser)
+router.post('/addUser',routeControl.add_user)
+router.post('/addadmin', userAuthentication.authorisation,routeControl.add_admin )
+router.get('/getgroups', userAuthentication.authorisation, routeControl.get_groups)
 module.exports = router;

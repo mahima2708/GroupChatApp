@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GroupChatApp</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.15/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="bg-sky-800">
+        <header class="text-white py-2 text-center">
+            <h1>GroupChat App</h1>
+        </header>
+    </nav>
+    <div class="flex justify-center pt-10 w-1/2 mx-auto">
+        <div class="border border-solid border-blue-800 rounded-lg h-40 w-full sm:w-2/3">
+               <div class="py-2 flex flex-col justify-between items-center w-full ">
+                   <label for="groupInput" class=" float-left font-semibold text-lg text-fuchsia-800 pb-4">Enter groupName</label>
+                   <input type="text" id="groupInput" placeholder ="Enter Group Name..." name="groupInput" class="pt-4 border border-solid border-fuschia-800 mr-2 sm:w-2/3">
+                   <button class="bg-gray-800 w-full sm:w-36 h-8 rounded-xl text-white mb-2 mt-4 " onclick="save(event)">Save</button>
+               </div>
+           </div>
+       </div>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+ async function save(event){
+            event.preventDefault()
+            try{
+                const name =document.getElementById('groupInput').value;
+                const group={
+                  name:name,
+                }
+                const token = localStorage.getItem('token')
+                const created = await axios.post('http://localhost:3000/groupCreate', group ,{headers: {"Authorisation": token} })
+                if(created.status===200){
+                    const details = {
+                        id: created.data.message.id
+                    }
+                    const addtable = await axios.post('http://localhost:3000/addadmin',details ,{headers: {"Authorisation": token} } )
+                    if(addtable.status===200){
+                        console.log("yeeeeeeeeeee")
+                    }
+                //     console.log("message from backend ", created.data.message.id);
+                //    console.log("hey its error")
+                   const id= created.data.message.id;
+                
+                //    if(localstorage.getItem!= null){
+
+                //    }
+                  localStorage.setItem('group', name);
+                  localStorage.setItem('grpId', id);
+                window.location.href = "users"
+                  
+                }
+            }
+            catch(err){
+              console.log(err);
+            }
+            
+        }
+</script>
+
+
+
+    
+    <script src="https://cdn.tailwindcss.com"></script>  
+</body>
+</html>

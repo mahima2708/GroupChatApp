@@ -7,6 +7,8 @@ const bodyParser= require('body-parser');
 const updatePass= require('./routers/forgotPassword');
 const passwordTable = require('./models/passwordupdate');
 const users = require('./models/signupDetails');
+const groups = require('./models/groupTable');
+const Usergroups = require('./models/userGroups');
 const messages = require('./models/messgaetable');
 
 
@@ -23,6 +25,12 @@ passwordTable.belongsTo(users)
 
 users.hasMany(messages)
 messages.belongsTo(users)
+
+users.belongsToMany(groups,{through:Usergroups})
+groups.belongsToMany(users,{through:Usergroups})
+
+groups.hasMany( Usergroups, { foreignKey: 'groupTableId' });
+Usergroups.belongsTo(groups, { foreignKey: 'groupTableId' });
 
 sequel.sync().then(result => {
     app.listen(3000);

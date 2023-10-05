@@ -56,7 +56,7 @@
                Number: event.target.form.number.value,
                Password: event.target.form.password.value
        } 
-       if(event.target.form.username.value===' '||  event.target.form.email.value=== ' ' ||  event.target.form.number.value=== ' '||  event.target.form.password.value=== ' ')
+       if(event.target.form.username.value===''||  event.target.form.email.value=== '' ||  event.target.form.number.value=== ''||  event.target.form.password.value=== '')
        {
         document.getElementById('warningMessage').style.display = 'block';
                 setTimeout(() => {
