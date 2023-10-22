@@ -34,7 +34,8 @@
                 const created = await axios.post('http://localhost:3000/groupCreate', group ,{headers: {"Authorisation": token} })
                 if(created.status===200){
                     const details = {
-                        id: created.data.message.id
+                        id: created.data.message.id,
+                        isAdmin: 1,
                     }
                     const addtable = await axios.post('http://localhost:3000/addadmin',details ,{headers: {"Authorisation": token} } )
                     if(addtable.status===200){

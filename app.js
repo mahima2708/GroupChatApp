@@ -32,6 +32,15 @@ groups.belongsToMany(users,{through:Usergroups})
 groups.hasMany( Usergroups, { foreignKey: 'groupTableId' });
 Usergroups.belongsTo(groups, { foreignKey: 'groupTableId' });
 
+users.hasMany( Usergroups, { foreignKey: 'UserId' });
+Usergroups.belongsTo(users, { foreignKey: 'UserId' });
+
+messages.belongsTo(groups, {foreignKey: 'groupId'})
+groups.hasMany(messages, {foreignKey: 'groupId'})
+
+
+
+
 sequel.sync().then(result => {
     app.listen(3000);
     

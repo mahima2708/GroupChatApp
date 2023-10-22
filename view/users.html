@@ -28,63 +28,82 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
-    async function getUsers(){
-    const token = localStorage.getItem('token')
-            const users = await axios.get('http://localhost:3000/user', {headers: {"Authorisation": token} })
-            if(users.status===200){
-              
-                var firstNode = "";
+  async function getUsers() {
+  const token = localStorage.getItem('token');
+  const users = await axios.get('http://localhost:3000/user', { headers: { "Authorisation": token } });
+  if (users.status === 200) {
+    const firstNode = document.getElementById('users');
 
-                for(var i=0;i<users.data.newdata.length;i++){
-                    console.log("all users", users.data.newdata[i])
-                    firstNode = document.getElementById('users');
-                    
-    var inputData = 0;
-        inputData = `
+    for (let i = 0; i < users.data.newdata.length; i++) {
+      const user = users.data.newdata[i];
+      const listItem = document.createElement('li');
+      listItem.id = user.id;
+      listItem.setAttribute("data-name", user.name);
+      listItem.classList.add("flex", "justify-between", "items-center", "border-4", "border-solid", "border-fuschia-800", "mx-auto", "p-2", "bg-gray-300", "rounded-lg", "w-full");
 
-  <li id = ${users.data.newdata[i].id} class="flex justify-between items-center border-4 border-solid border-fuschia-800 mx-auto p-2 bg-gray-300 rounded-lg w-full ">
+      const userName = document.createElement('div');
+      userName.classList.add("txt-black", "font-bold", "text-lg");
+      userName.textContent = user.name;
 
-    <div class="txt-black font-bold text-lg  ">${users.data.newdata[i].name }  </div>
-    
-    <button class= "bg-gray-800 text-white rounded-xl ml-2 h-8 w-14 mb-2" onclick = "addUser(${users.data.newdata[i].id})">Add </button> 
-      
-  </li>
-`;
+      const addButton = document.createElement('button');
+      addButton.classList.add("bg-gray-800", "text-white", "rounded-xl", "ml-2", "h-8", "w-14", "mb-2");
+      addButton.textContent = "Add";
+      addButton.addEventListener('click', () => addUser(user.id, listItem));
 
- firstNode.innerHTML = firstNode.innerHTML + inputData;
+      listItem.appendChild(userName);
+      listItem.appendChild(addButton);
+      firstNode.appendChild(listItem);
+    }
+  }
+}
+getUsers()
 
- 
-                }
-              
-            }
-        }
-     
-        getUsers();
+async function addUser(id, listItem) {
+  try {
+    const details = {
+      UserId: id,
+      isAdmin:0
+    }
+    // Make the API call to add the user to the group.
+    const response = await axios.post('http://localhost:3000/addUser', { details, groupTableId: localStorage.getItem('grpId') });
 
+    if (response.status === 200) {
+      console.log("User added successfully");
+      const userName = listItem.getAttribute("data-name");
 
-       async function addUser(id){
-        try{
-            const gpname = localStorage.getItem('group');
-            const gpId = localStorage.getItem('grpId');
-            console.log("id pf the user is", id );
-            console.log("group name is ", gpname);
-            console.log("group id is ", gpId);
-            const details = {
-                UserId: id,
-                groupTableId: gpId
-            }
-           await axios.post('http://localhost:3000/addUser', details).then((response)=>{
-                    if(response.status===200){
-                        console.log("well done")
-                    }
-           })
-        }
-        catch(err){
-            console.log(err);
-        }
+      // Replace the "Add" button with "Make Admin" and "Remove" buttons
+      listItem.innerHTML = `
+      <div class="txt-black font-bold text-lg">${userName}</div>
+        <button class="bg-gray-800 text-white rounded-xl ml-2 h-8 w-14 mb-2" onclick="makeAdmin(${id})">Make Admin</button>
+        <button class="bg-gray-800 text-white rounded-xl ml-2 h-8 w-14 mb-2" onclick="removeUser(${id})">Remove</button>
+      `; 
+    }
+  } catch (err) {
+    console.error("Error adding user:", err);
+  }
+}
 
+async function makeAdmin(id) {
+  
+  console.log("the id is ", id);
+  const groupID = localStorage.getItem('grpId')
+  const ids= {
+    id: id,
+    groupId: groupID,
+  }
+  const admin = await axios.post('http://localhost:3000/makeadmin', ids);
+  if(admin.status===200){
+    console.log('yess its done atlast');
+  }
+  
 
-        }
+}
+
+function removeUser(id) {
+  // Implement the logic to remove the user from the group.
+  // You can use another API call to remove the user from the group.
+}
+
 
     function save(event){
         try{

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EditUsers</title>
+</head>
+<body>
+    <nav class="bg-sky-800">
+        <header class="text-white py-2 text-center">
+            <h1>GroupChat App</h1>
+        </header>
+    </nav>
+    <div class="flex justify-center items-center h-screen mx-2">
+        <div class="border border-solid border-blue-800 rounded-lg w-full sm:w-2/3">
+            <div class="py-2 text-center">
+                <h1 class="items-center font-semibold text-2xl "> UPDATE USERS</h1>
+                <div id="usersList" class="top-20 left-10 w-full h-30 ro flex flex-col justify-between items-center">
+                    <ul class="overflow-auto text-left w-full justify-between items-center" id="users">
+                    </ul>
+                </div>
+                
+                
+            </div>
+            <button class= "bg-gray-800 text-white rounded-xl ml-2 h-8 w-14 mb-2" onclick = "save(event)">Save </button> 
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+       const firstNode = document.getElementById('users');
+            async function updateUsers(){
+            const token = localStorage.getItem('token');
+            console.log("its this token", token);
+            const grpId = {
+                id: localStorage.getItem('grpId')
+            }
+          const details = await axios.post('http://localhost:3000/updateUsers', grpId)
+          console.log(details)
+               if(details.status === 200){
+  
+                console.log("the data is", details.data.message.length);
+
+    for (let i = 0; i <details.data.message.length; i++) {
+      const user =details.data.message[i];
+      const listItem = document.createElement('li');
+      listItem.id = user.Userid;
+      listItem.setAttribute("data-name", user.nameval);
+      listItem.classList.add("flex", "justify-between", "items-center", "border-4", "border-solid", "border-fuschia-800", "mx-auto", "p-2", "bg-gray-300", "rounded-lg", "w-full");
+
+      const userName = document.createElement('div');
+      userName.classList.add("txt-black", "font-bold", "text-lg");
+      userName.textContent = user.nameval;
+         if(user.adminval=== false){
+            const adminButton = document.createElement('button');
+            const rmvButton = document.createElement('button');
+            adminButton.classList.add("adminbutton","bg-gray-800", "text-white", "rounded-xl", "ml-2", "h-8", "w-32", "mb-2");
+            rmvButton.classList.add("rmvbutton","bg-gray-800", "text-white", "rounded-xl", "ml-2", "h-8", "w-20", "mb-2");
+      adminButton.textContent = "MakeAdmin";
+      rmvButton.textContent = "Remove";
+      adminButton.addEventListener('click', () => adminUser(user.Userid, listItem));
+      rmvButton.addEventListener('click', () => removeUser(user.Userid, listItem));
+
+      listItem.appendChild(userName);
+      listItem.appendChild(adminButton);
+      listItem.appendChild(rmvButton);
+      firstNode.appendChild(listItem);
+            
+         }
+else if(user.adminval=== null){
+
+      const addButton = document.createElement('button');
+      addButton.classList.add("bg-gray-800", "text-white", "rounded-xl", "ml-2", "h-8", "w-14", "mb-2");
+      addButton.textContent = "Add";
+      addButton.addEventListener('click', () => addUser(user.Userid, listItem));
+
+      listItem.appendChild(userName);
+      listItem.appendChild(addButton);
+      firstNode.appendChild(listItem);
+}
+else if(user.adminval=== true){
+
+    const addButton = document.createElement('button');
+      addButton.classList.add("bg-teal-500", "text-white", "rounded-xl", "ml-2", "h-8", "w-32", "mb-2");
+      addButton.textContent = "GroupAdmin";
+
+      listItem.appendChild(userName);
+      listItem.appendChild(addButton);
+      firstNode.appendChild(listItem);
+}  
+    }
+  }
+            }
+
+           async function adminUser(id, listItem){
+            console.log("er are ifsdkfnsjkdfn", id);
+            const groupID = localStorage.getItem('grpId')
+            const ids= {
+                       id: id,
+                        groupId: groupID,
+                    }
+            const admin = await axios.post('http://localhost:3000/makeadmin', ids);
+            console.log("admin is", admin)
+              if(admin.status===200){
+                      console.log('yess its done atlast');
+                      const userName = listItem.getAttribute("data-name");
+                      console.log("whyyyyyyyyy", userName)
+                      const addButton = document.createElement('button');
+      addButton.classList.add("bg-teal-500", "text-white", "rounded-xl", "ml-2", "h-8", "w-32", "mb-2");
+      addButton.textContent = "GroupAdmin";
+
+// Replace the "Add" button with "Make Admin" and "Remove" buttons
+listItem.innerHTML = `
+<div class="txt-black font-bold text-lg">${userName}</div>
+`; 
+// listItem.appendChild(userName);
+      listItem.appendChild(addButton);
+      firstNode.appendChild(listItem);
+
+                   }
+                }
+
+          
+             async function removeUser(id, listItem){
+              const groupid = localStorage.getItem('grpId')
+                const dropUser = await axios.delete(`http://localhost:3000/deletUser?param1=${id}&param2=${groupid}`).then((response)=>{
+                  console.log("response is ", response);
+                  if(response.status===200){
+                    const userName = listItem.getAttribute("data-name");
+                      console.log("whyyyyyyyyy", userName)
+                      const addButton = document.createElement('button');
+      addButton.classList.add("bg-gray-800", "text-white", "rounded-xl", "ml-2", "h-8", "w-14", "mb-2");
+      addButton.textContent = "Add";
+      addButton.addEventListener('click', () => addUser(user.Userid, listItem));
+
+      listItem.innerHTML = `
+<div class="txt-black font-bold text-lg">${userName}</div>
+`; 
+listItem.appendChild(addButton);
+firstNode.appendChild(listItem);
+                  }
+
+                })
+              }
+
+              async function addUser(id, listItem) {
+  try {
+    const details = {
+      UserId: id,
+      isAdmin:0
+    }
+    // Make the API call to add the user to the group.
+    const response = await axios.post('http://localhost:3000/addUser', { details, groupTableId: localStorage.getItem('grpId') });
+
+    if (response.status === 200) {
+      console.log("User added successfully");
+      const userName = listItem.getAttribute("data-name");
+
+      // Replace the "Add" button with "Make Admin" and "Remove" buttons
+      listItem.innerHTML = `
+      <div class="txt-black font-bold text-lg">${userName}</div>
+        <button class="bg-gray-800 text-white rounded-xl ml-2 h-8 w-32 mb-2" onclick="makeAdmin(${id})">Make Admin</button>
+        <button class="bg-gray-800 text-white rounded-xl ml-2 h-8 w-20 mb-2" onclick="removeUser(${id})">Remove</button>
+      `; 
+    }
+  } catch (err) {
+    console.error("Error adding user:", err);
+  }
+}
+
+            updateUsers()
+
+
+      
+    </script>
+
+     <script src="https://cdn.tailwindcss.com"></script>  
+</body>
+</html>

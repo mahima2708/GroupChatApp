@@ -28,6 +28,11 @@ exports.sendUser = (req,res,next)=>{
     res.sendFile(filepath);
 }
 
+exports.EditPage = (req,res,next)=>{
+    const filepath = path.join(__dirname, '../view/editUsers.html');
+    res.sendFile(filepath);
+}
+
 
 function generateToken(id,name){
     return token.sign({userId:id,name:name}, '45$545778%576565');
@@ -56,6 +61,7 @@ exports.addUser = async (req,res,next)=>{
         res.status(200).json({newdata:data})
     }
     catch(error){
+        console.log(error);
         res.status(201).json({duplicate: "duplicateentry"})
     }
     })
@@ -102,11 +108,13 @@ exports.loginUser = async ( req,res,next)=>{
 
 exports.storemessages = async (req,res,next)=>{
     const message = req.body.message;
+    const id= req.body.id;
     try{
         const data = await msgTable.create({
             message,
             UserId: req.user.id,
             name:req.user.name,
+            groupId:id,
         });
         res.status(200).json({message: data , success: true})
 
@@ -201,11 +209,15 @@ exports.getUsers = async (req,res,next)=>{
 }
 
 exports.add_user = async (req,res,next)=>{
-    const UserId = req.body.UserId;
+    console.log("here is your user", req.body.details.isAdmin)
+    const UserId = req.body.details.UserId;
+   
     const groupTableId = req.body.groupTableId
+    const admin = req.body.details.isAdmin
     try{
         console.log("format", req.body);
         const detail= userGroup.create({
+            isAdmin: admin,
             UserId,
             groupTableId
         }) 
@@ -219,11 +231,14 @@ exports.add_user = async (req,res,next)=>{
 
 exports.add_admin  = async (req,res,next)=>{
     const groupTableId = req.body.id
+    const admin = req.body.isAdmin;
+    console.log("is it null", admin)
     try{
         console.log("format", req.body);
         const detail= userGroup.create({
             UserId: req.user.id,
-            groupTableId
+            groupTableId,
+            isAdmin: admin
         }) 
         res.status(200).json({message:detail, success:true})
     }
@@ -245,7 +260,6 @@ exports.get_groups = async (req,res,next)=>{
       attributes: [], // Exclude all columns from Usersgroups table
     },
   }).then((response)=>{
-    console.log("here is group response ###", response)
     response.forEach((items)=>{
         groupArray.push({
 
@@ -263,6 +277,171 @@ exports.get_groups = async (req,res,next)=>{
         res.status(400).json({message:err, success:false});
      console.log(err);
     }
+
+
+}
+
+exports.groupDetails = async (req,res,next)=>{
+    try{
+        console.log("helloooo ladiessss");
+        var memberArray = [];
+    console.log("request", req.body);
+     const id = req.body.groupid;
+     console.log('id is', id)
+     const memebrs = await userTable.findAll({
+        attributes: ['name'],
+        include: {
+          model: userGroup,
+          where: { groupTableId: id },
+        },
+      }).then((response)=>{
+        response.forEach((items)=>{
+            memberArray.push({
+                name: items.name
+            })
+        })
+        console.log("the members are $$$", memberArray);
+      }).catch((err)=>{
+        console.log(err);
+      })
+      res.status(200).json({message: memberArray, success: true});
+
+    }
+    catch(err){
+        console.log("the error is", err);
+    }
+
+}
+
+exports.groupMessages = async (req,res,next)=>{
+    const Id = req.params.id;
+    console.log("the group id is", Id)
+    const groupmsgArray= [];
+    await msgTable.findAll({
+        where: {
+            groupId: Id
+        }
+    }).then((response)=>{
+        response.forEach((items)=>{
+            groupmsgArray.push({
+                name: items.name,
+                message: items.message
+            })
+        });
+         res.status(200).json({ message: groupmsgArray, success: true});
+    }).catch((err)=>{
+        console.log(err);
+    }) 
+
+
+
+}
+
+exports.makeAdmin = async (req,res,next)=>{
+    try{
+    console.log("heres your request body", req.body)
+  await userGroup.update(
+    { isAdmin: 1 },
+    {
+      where: {
+        UserId: req.body.id,
+        groupTableId: req.body.groupId
+      }
+    }
+  )
+  res.status(200).json({message:"updated successfully", success: true })
+}
+catch(err){
+    res.status(202).json({message: err, success: false})
+}
+}
+
+exports.Update_Users = async (req, res, next)=>{
+    try{
+        console.log("the req body", req.body);
+ const id  = req.body.id;
+ console.log("the group id ", id)
+    const memebrs = await userTable.findAll({
+        attributes: ['name', 'id'],
+        include: {
+          model: userGroup,
+        // attributes: ['isAdmin'],
+          where: { groupTableId: id },
+        },
+      })
+   console.log("is it coming @@@", memebrs);
+const UpdatArray=[]
+for (const user of memebrs) {
+    var name = "";
+    var idVal = "";
+    var adminstat=""
+    //console.log(user.dataValues.usersGroups)
+    for (const kk of user.dataValues.usersGroups){
+         name = user.dataValues.name
+        adminstat =kk.dataValues.isAdmin
+        idVal= user.dataValues.id
+      
+          } 
+     const jsonMessage={
+        Userid: idVal,
+        nameval:name,
+        adminval:adminstat
+    }
+    UpdatArray.push(jsonMessage)
+    
+  }
+  const excludedUserIds = memebrs.map(user => user.id);
+
+// Construct a query to fetch all users excluding the ones in excludedUserIds
+const allUsers = await userTable.findAll({
+  attributes: ['name', 'id'],
+  where: {
+    id: {
+      [Op.notIn]: excludedUserIds,
+    },
+  },
+});
+
+// Transform the result into the desired format
+const updatedArray = allUsers.map(user => ({
+    Userid: user.id,
+    nameval: user.name,
+    adminval: null,
+
+  
+  // Assuming you want adminval to be null for these users
+}));
+
+// const updatedArrayJSON = JSON.stringify(updatedArray);
+
+UpdatArray.push(...updatedArray);
+
+
+  console.log("##########################",UpdatArray);
+     
+      res.status(200).json({message: UpdatArray, success: true});
+    }
+    catch(err){
+        console.log(err);
+    }
+
+}
+
+exports.delete_User = async (req,res,next)=>{
+console.log("req.body", req.query.param1);
+try{
+const userdeleted = await userGroup.destroy({
+    where: {
+        UserId: req.query.param1,
+        groupTableId: req.query.param2,
+    }
+})
+res.status(200).json({ message: "User removed from group successfully", success: true})
+}
+catch(err){
+    res.status(202).json({message:"couldn't proceed to your request", success: false})
+    console.log(err);
+}
 
 
 }

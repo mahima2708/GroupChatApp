@@ -32,17 +32,24 @@
         <!-- Message Display Area -->
 
         <div class="border-2 border-solid border-teal-600  mt-2 ml-2 mb-2 rounded-lg sm:w-2/3 p-2 sm:sticky h-5/6 sm:h-5/6 bg-white flex justify-between">
-            <div id="group_name" class=" hidden px-10 my-2 flex justify-between">
-                <h1 class=" text-green ">My2ndGroup</h1>
+            <div id="group_name" class=" hidden px-10 my-2 h-14 flex justify-between">
+                <h1 class=" font-semibold text-lg text-green ">My2ndGroup</h1>
                 <div class="space-x-2">
-                    <button class="bg-gray-800 w-28 h-8 rounded-xl text-white fixed right-28" onClick="createGroup(event)">Edit</button>
-                    <button class="bg-gray-800 w-20 h-8 rounded-xl text-white fixed right-10" onClick="logout(event)">Info</button>
+                    <button class="bg-gray-800 w-28 h-8 rounded-xl text-white fixed right-28" onClick="editGroup(event)">Edit</button>
+                    <button class="bg-gray-800 w-20 h-8 rounded-xl text-white fixed right-10" onClick="information(event)">Info</button>
                 </div>
+            </div>
+
+            <div id="groupmemberDiv" class="hidden block rounded-xl w-28 text fixed right-10 top-28 text-center ">
+             <ul id = "groupInfo">
+                <!-- <li class="rounded-xl bg-gray-300 border-2 border-solid border-teal-800" > mahima </li>
+                <li class="rounded-xl bg-gray-300  border-2 border-solid border-teal-800 ">mishka</li> -->
+             </ul> 
             </div>
             
             
            
-            <div class="px-10 my-2 flex justify-center">
+            <div class="px-10 my-2 mt-14 fixed right-28flex justify-center">
                 <ul class="overflow-auto" id="messages"></ul>
             </div>
         </div>
@@ -59,26 +66,40 @@
          
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
-
-        function grouphandler(){
+ var listNode = document.getElementById('groupInfo'); 
+ var listElement = "";
+ var firstNode = document.getElementById('messages');
+      async function grouphandler(){
             if(localStorage.getItem('currentgrp')!= null){
               const grpDiv = document.getElementById("group_name");
-              grpDiv.classList.toggle('hidden');
+              grpDiv.classList.remove('hidden');
               const h1Element = grpDiv.querySelector('h1');
               const groupname = localStorage.getItem('currentgrp');
-
+              const id = localStorage.getItem('grpId');
                h1Element.textContent = groupname;
+               
+               const message = await axios.get(`http://localhost:3000/groupmessages/${id}`).then((response)=>{
+                console.log("here is your response", response.data);
+                for(var i=0;i<response.data.message.length;i++){
+                showOnScreen(response.data.message[i],i)
+                }
+               }).catch((err)=>{
+                console.log(err);
+               })
+              
 
             }
         }
+      //  grouphandler()
 
-        grouphandler()
         async function sendMessage(event){
             event.preventDefault()
             try{
                 const userInput = document.getElementById("userInput").value;
+                const id= localStorage.getItem('grpId');
                 const messages = {
-                    message: userInput
+                    message: userInput,
+                    id:id
                 }
                 const token = localStorage.getItem('token');
                 const message = await axios.post('http://localhost:3000/messages',  messages  ,{headers: {"Authorisation": token} })
@@ -91,6 +112,8 @@
                 console.log(err);
             }
         }
+
+    
         
         window.addEventListener('DOMContentLoaded', ()=>{
          async function getandsavetolocalstorage(){
@@ -175,7 +198,7 @@
 
             }  
             }
-            // getandsavetolocalstorage();
+    //         getandsavetolocalstorage();
         
     //     setInterval(() => {
     //         getandsavetolocalstorage();
@@ -184,45 +207,53 @@
            
         })
 
-        async function displaygroupName() {
+ async function displaygroupName() {
   const token = localStorage.getItem('token');
   const grList = document.getElementById('grpList');
-  if (localStorage.getItem("group") !== null) {
+//   if (localStorage.getItem("group") !== null) {
     const groups = await axios.get('http://localhost:3000/getgroups', {
-      headers: { "Authorisation": token } // Note the corrected spelling of "Authorization"
+      headers: { "Authorisation": token }
     }).then((response) => {
       console.log("groups are", response.data.message.length);
       for (var i = 0; i < response.data.message.length; i++) {
         const listItem = document.createElement('li');
-        listItem.id = response.data.message[i].id;
+        listItem.id = response.data.message[i].idValue;
         listItem.className = "text-green bg-gray-300 p-2 border-2 border-solid border-black-800";
         listItem.innerHTML = `<span class="text-green text-lg">${response.data.message[i].name}</span>`;
-        
-        // Add a click event listener to the created list item
-        listItem.addEventListener('click', function() {
-          // Handle the click event here, for example, alert the ID
-          console.log("its almost done ")
-        });
-
+        const group_Name = response.data.message[i].name;
+        const group_Id =  response.data.message[i].idValue;
+        //Add a click event listener to the created list item
+        listItem.addEventListener('click', () => {
+  displayGroupInfo(group_Name, group_Id);
+});
         grList.appendChild(listItem);
       }
     })
-  }
-}
+ }
+// }
 
+function displayGroupInfo(name,id) {
+            const div = document.getElementById('groupmemberDiv');
+            div.classList.toggle('hidden');
+            firstNode.innerHTML = '';
+            listNode.innerHTML = '';
+            // console.log("name is",group_Id);
+            localStorage.setItem('currentgrp',name);
+            localStorage.setItem('grpId',id);
+            grouphandler()
+          // Handle the click event here, for example, alert the ID
+          console.log("its almost done ")
+        }
    
 function  showOnScreen(data,i){
     document.getElementById('userInput').value = "";
-    const firstNode = documenputData = 0;
+   
+    
     if(i%2!=0){
-        inputData = `
-
-  <li class="mr-4 p-2 bg-gray-300 rt.getElementById('messages');
-    var inounded-lg ">
-    <span class=" text-black text-green text-sm underline"> ${data.name }: </span><br>
-    <span class="ml-2 font-semibold text-black">  ${data.message}</span>
-  </li>
-`;
+        inputData = `<li class = "mr-4 p-2 bg-stone-200  rounded-lg mb-2 fixed  "> 
+                <span class=" text-black text-green text-sm underline"> ${data.name }: </span><br>
+                <span class="ml-2 font-semibold text-black">  ${data.message}</span>
+                             </li>`;
 
               }
 
@@ -261,40 +292,32 @@ displaygroupName()
             }
         }
 
-//         async function addUsers(){
+        async function information(event){
+            listNode.innerHTML = '';
+         const id =localStorage.getItem('grpId')
+         const groupId ={
+            groupid:id
+         }
+         console.log("the group id ", id);
+        const members =  await  axios.post('http://localhost:3000/getmembers', groupId).then((response)=>{
+            console.log("response is", response);
+          const div =   document.getElementById('groupmemberDiv');
+           div.classList.toggle('hidden')
+           for(var i =0; i<response.data.message.length;i++){
+             listElement = ` <li class="rounded-xl bg-gray-300 border-2 border-solid border-teal-800" > ${response.data.message[i].name} </li>`
+            listNode.innerHTML = listNode.innerHTML+ listElement;
+           }
+        }).catch((err)=>{
+            console.log(err);
+        })
 
-//             const token = localStorage.getItem('token')
-//             const users = await axios.get('http://localhost:3000/users', {headers: {"Authorisation": token} })
-//             if(users.status===200){
-//                 var container = document.getElementById('usersList');
-//                     container.classList.toggle('hidden')
-//                 console.log("all users", users.data.newdata[0].name)
-//                 var firstNode = "";
+}
 
-//                 for(var i=0;i<users.data.newdata.length;i++){
-//                     firstNode = document.getElementById('users');
-                    
-//     var inputData = 0;
-//         inputData = `
+ function editGroup(event){
+    window.location.href = "editUsers"
+ }
 
-//   <li class="mr-4 p-2 bg-gray-300 rounded-lg flex justify-between items-center ">
 
-//     <div class="txt-black font-bold text-lg ">${users.data.newdata[i].name }  </div>
-    
-//     <button class= "bg-gray-800 text-white rounded-xl ml-2 h-8 w-14 mb-2">Add </button> 
-      
-//   </li>
-// `;
-
-//  firstNode.innerHTML = firstNode.innerHTML + inputData;
-
- 
-//                 }
-              
-//             }
-           
-
-//         }
 
        
     </script>
