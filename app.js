@@ -11,6 +11,9 @@ const groups = require('./models/groupTable');
 const Usergroups = require('./models/userGroups');
 const messages = require('./models/messgaetable');
 
+const dotenv = require('dotenv');
+dotenv.config();
+
 
 
 app.use(express.static(path.join(__dirname, 'view')));

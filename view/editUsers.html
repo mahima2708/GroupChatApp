@@ -153,14 +153,27 @@ firstNode.appendChild(listItem);
 
     if (response.status === 200) {
       console.log("User added successfully");
+      // const liname = listItem.getAttribute("data-name");
       const userName = listItem.getAttribute("data-name");
+                      console.log("whyyyyyyyyy", userName)
+                      const addButton = document.createElement('button');
+      addButton.classList.add("bg-gray-800", "text-white", "rounded-xl", "ml-2", "h-8", "w-20", "mb-2");
+      addButton.textContent = "Remove";
+      addButton.addEventListener('click', () => removeUser(id, listItem));
+      const adButton = document.createElement('button');
+      adButton.classList.add("bg-gray-800", "text-white", "rounded-xl", "ml-2", "h-8", "w-32", "mb-2");
+      adButton.textContent = "MakeAdmin";
+      adButton.addEventListener('click', () => adminUser(id, listItem));
 
-      // Replace the "Add" button with "Make Admin" and "Remove" buttons
+
       listItem.innerHTML = `
-      <div class="txt-black font-bold text-lg">${userName}</div>
-        <button class="bg-gray-800 text-white rounded-xl ml-2 h-8 w-32 mb-2" onclick="makeAdmin(${id})">Make Admin</button>
-        <button class="bg-gray-800 text-white rounded-xl ml-2 h-8 w-20 mb-2" onclick="removeUser(${id})">Remove</button>
-      `; 
+<div class="txt-black font-bold text-lg">${userName}</div>
+`; 
+listItem.appendChild(adButton);
+listItem.appendChild(addButton);
+
+firstNode.appendChild(listItem);
+       
     }
   } catch (err) {
     console.error("Error adding user:", err);
