@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
-    <title>ExpenseTracker</title>
+    <title>MyChatApp</title>
    
 </head>
 <body class="bg-gray-100">
@@ -64,7 +64,7 @@
                 }, 500);
                 return;
        }
-      const call = await  axios.post("http://13.232.107.32/:3000/signup", obj )
+      const call = await  axios.post("http://13.232.107.32:3000/signup", obj )
       if(call.status=== 200){
         console.log("successful");
         alert("User signed in successfully");
