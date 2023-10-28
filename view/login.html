@@ -42,7 +42,7 @@
                         email: event.target.form.email.value,
                         password: event.target.form.password.value
                     }
-                    const res = await axios.post('http://13.232.107.32/:3000/login',login).then((response)=>{
+                    const res = await axios.post('http://13.232.107.32:3000/login',login).then((response)=>{
 
                         if(response.status==200)
                     console.log("******",response)
@@ -54,7 +54,7 @@
 
                     . catch((err)=>{
                         var val = document.getElementById("Block");
-                        console.log("@@@@3456", err.response.data);
+
                         
                        val.innerHTML= err.response.data.message;
                         document.body.innerHTML += `<div style="colour:red;">${err}</div>`;

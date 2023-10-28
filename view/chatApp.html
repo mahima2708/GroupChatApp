@@ -78,7 +78,7 @@
               const id = localStorage.getItem('grpId');
                h1Element.textContent = groupname;
                
-               const message = await axios.get(`http://13.232.107.32/:3000/groupmessages/${id}`).then((response)=>{
+               const message = await axios.get(`http://13.232.107.32:3000/groupmessages/${id}`).then((response)=>{
                 console.log("here is your response", response.data);
                 for(var i=0;i<response.data.message.length;i++){
                 showOnScreen(response.data.message[i],i)
@@ -102,7 +102,7 @@
                     id:id
                 }
                 const token = localStorage.getItem('token');
-                const message = await axios.post('http://13.232.107.32/:3000/messages',  messages  ,{headers: {"Authorisation": token} })
+                const message = await axios.post('http://13.232.107.32:3000/messages',  messages  ,{headers: {"Authorisation": token} })
                 if(message.status===200){
                     console.log("23232",message.data.message);
                     showOnScreen(message.data.message,0)
@@ -123,7 +123,7 @@
             console.log("is it blank", lclstorage);
             if(lclstorage===null){
                 const idval =0;
-                await axios.get(`http://13.232.107.32/:3000/message/${idval}`).then(async(response)=>{
+                await axios.get(`http://13.232.107.32:3000/message/${idval}`).then(async(response)=>{
                console.log("@#@#@#@#", response);
                const msgArray = [];
                var lower_bound =0;
@@ -155,7 +155,7 @@
              const lastid  = parseentry.length;
              const idval = parseentry[lastid-1].id;
              console.log("isssssssssss", idval)
-             await axios.get(`http://13.232.107.32/:3000/message/${idval}`).then(async(response)=>{
+             await axios.get(`http://13.232.107.32:3000/message/${idval}`).then(async(response)=>{
                console.log("@#@#@#@#", response);
             if(response.data.newdata.length!=0){
                const msgArray = [];
@@ -211,7 +211,7 @@
   const token = localStorage.getItem('token');
   const grList = document.getElementById('grpList');
 //   if (localStorage.getItem("group") !== null) {
-    const groups = await axios.get('http://13.232.107.32/:3000/getgroups', {
+    const groups = await axios.get('http://13.232.107.32:3000/getgroups', {
       headers: { "Authorisation": token }
     }).then((response) => {
       console.log("groups are", response.data.message.length);
@@ -299,7 +299,7 @@ displaygroupName()
             groupid:id
          }
          console.log("the group id ", id);
-        const members =  await  axios.post('http://13.232.107.32/:3000/getmembers', groupId).then((response)=>{
+        const members =  await  axios.post('http://13.232.107.32:3000/getmembers', groupId).then((response)=>{
             console.log("response is", response);
           const div =   document.getElementById('groupmemberDiv');
            div.classList.toggle('hidden')
