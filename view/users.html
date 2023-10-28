@@ -30,7 +30,7 @@
 <script>
   async function getUsers() {
   const token = localStorage.getItem('token');
-  const users = await axios.get('http://localhost:3000/user', { headers: { "Authorisation": token } });
+  const users = await axios.get('http://13.232.107.32/:3000/user', { headers: { "Authorisation": token } });
   if (users.status === 200) {
     const firstNode = document.getElementById('users');
 
@@ -65,7 +65,7 @@ async function addUser(id, listItem) {
       isAdmin:0
     }
     // Make the API call to add the user to the group.
-    const response = await axios.post('http://localhost:3000/addUser', { details, groupTableId: localStorage.getItem('grpId') });
+    const response = await axios.post('http://13.232.107.32/:3000/addUser', { details, groupTableId: localStorage.getItem('grpId') });
 
     if (response.status === 200) {
       console.log("User added successfully");
@@ -91,7 +91,7 @@ async function makeAdmin(id) {
     id: id,
     groupId: groupID,
   }
-  const admin = await axios.post('http://localhost:3000/makeadmin', ids);
+  const admin = await axios.post('http://13.232.107.32/:3000/makeadmin', ids);
   if(admin.status===200){
     console.log('yess its done atlast');
   }

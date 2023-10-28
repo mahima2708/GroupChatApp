@@ -46,7 +46,7 @@ exports.sendmail = async (req,res,next)=>{
                 to: recievers,
                 subject: 'Reset Password',
                 textContent: 'Reset your password via the link provided below',
-                htmlContent: `<a href ="http://localhost:3000/password/resetpassword/${id}">Reset Password</a>`
+                htmlContent: `<a href ="http://13.232.107.32/:3000/password/resetpassword/${id}">Reset Password</a>`
 
             }).then(response=>{
                 return res.status(202).json({message: 'Link to reset password send', success: true})
